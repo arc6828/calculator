@@ -9,7 +9,7 @@
     <h2>ผลลัพธ์</h2>
     
     <div class="display">
-        <?php calculate($_GET['phone_number']); ?>
+        <?php $data = calculate($_GET['phone_number']); ?>
     </div>
 <?php } ?>
 
@@ -28,7 +28,7 @@ function generate_pairs_array($phone_number){
 }
 
 function calculate_score($pairs){
-    return rand(-999,999);
+    return rand(0,999);
 }
 function calculate_grade($sum_score_percent){
     if($sum_score_percent > 950){
@@ -76,11 +76,63 @@ function calculate($phone_number){
     echo "<br>SUM : ". $sum_score;
 
     //CALCULATE PERCENT : MAX 1000
-    $sum_score_percent = $sum_score / count($pairs_array) * 1000;
+    $sum_score_percent = $sum_score / count($pairs_array) ;
     
     //CALCULATE GRADE
     $grade = calculate_grade($sum_score_percent);
+    
+    echo "<br>SUM_SCORE_PERCENT : ". $sum_score_percent;
     echo "<br>Grade : ". $grade;
-
+    return "[".join(", ",$scores)."]";
 }
 ?>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.bundle.min.js"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.min.js"></script>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.min.css">
+
+
+
+
+<canvas id="myChart" style="max-width: 600px; max-height : 600px;"></canvas>
+<script>
+var ctx = document.getElementById('myChart');
+var myChart = new Chart(ctx, {
+    type: 'radar',
+    data: {
+        labels: ['Money', 'Love', 'Yellow', 'Green', 'Purple', 'Orange'],
+        datasets: [{
+            label: '# of Votes',
+            //data: [12, 19, 3, 5, 2, 3],
+            data: <?= $data ?>,
+            backgroundColor: [
+                'rgba(255, 99, 132, 0.2)',
+                'rgba(54, 162, 235, 0.2)',
+                'rgba(255, 206, 86, 0.2)',
+                'rgba(75, 192, 192, 0.2)',
+                'rgba(153, 102, 255, 0.2)',
+                'rgba(255, 159, 64, 0.2)'
+            ],
+            borderColor: [
+                'rgba(255, 99, 132, 1)',
+                'rgba(54, 162, 235, 1)',
+                'rgba(255, 206, 86, 1)',
+                'rgba(75, 192, 192, 1)',
+                'rgba(153, 102, 255, 1)',
+                'rgba(255, 159, 64, 1)'
+            ],
+            borderWidth: 1
+        }]
+    },
+    options: {
+        scales: {
+            yAxes: [{
+                ticks: {
+                    beginAtZero: true
+                }
+            }]
+        }
+    }
+});
+</script>
