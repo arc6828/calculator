@@ -1,17 +1,150 @@
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+<script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+
 <h1>ทำนายเบอร์</h1>
 <form action="/calculator/index.php" method="GET">
-    <input name="phone_number"  id="phone" placeholder="กรอกเบอร์โดยไม่ต้องใส่ -" value="<?= $_GET['phone_number'] ?>">
+    <input name="phone_number"  id="phone" placeholder="กรอกเบอร์โดยไม่ต้องใส่ -" value="<?= isset($_GET['phone_number']) ? $_GET['phone_number']  : '' ?>" required >
+    <input name="date_of_birth"  id="date_of_birth" placeholder="วันเดือนปีเกิดของท่าน" type="date" value="<?= isset($_GET['date_of_birth']) ? $_GET['date_of_birth']  : '' ?>">
+    <select name="hour"  id="hour">
+        <?php for($i=0; $i<24; $i++){ ?>
+        <option value="<?=$i?>" <?= intval($_GET['hour'])==$i?'selected':'' ?> ><?=sprintf("%02d", $i)?></option>
+        <?php } ?>
+    </select >
+    <select name="minute"  id="minute">
+        <?php for($i=0; $i<60; $i++){ ?>
+        <option value="<?=$i?>"  <?= intval($_GET['minute'])==$i?'selected':'' ?> ><?=sprintf("%02d", $i)?></option>
+        <?php } ?>
+    </select>
     <button>ทำนาย</button> 
 
 </form>
 
 <?php if( !empty($_GET['phone_number']) ){ ?>
     <h2>ผลลัพธ์</h2>
-    
-    <div class="display">
-        <?php $data = calculate($_GET['phone_number']); ?>
+    <div class="row">
+        <div class="col-lg-12">
+            <?php $data = general($_GET['phone_number']); ?>
+        
+        </div>
     </div>
+
+    <div class="row">
+        <div class="col-lg-6 display">
+            <h3>Grade</h3>
+            <?php $data = grade($_GET['phone_number']); ?>
+        </div>
+        
+        <div class="col-lg-6 display">
+        
+            <h3>Graph</h3>
+            <?php $data = graph($_GET['phone_number']); ?>
+            
+            <canvas id="myChart" style="max-width: 600px; max-height : 600px;"></canvas>
+        </div>
+    </div>
+    
 <?php } ?>
+<?php 
+function general($phone_number){
+    $date = $_GET['date_of_birth'];
+    $time = floatval($_GET['hour'].".".$_GET['minute']);
+    echo "<br>number : ". $phone_number;
+    echo "<br>date : ". $date;
+    echo "<br>time : ". $time;
+
+    $d=date_create($date);
+    echo "<br>Day Code : ". (date_format($d,"l")). " " .(date_format($d,"w")+1);
+    
+}
+?>
+
+<?php 
+function generate_pairs_array_for_grade($phone_number){
+    $new_pairs = [
+        $phone_number[8].$phone_number[9],  //HI(89)
+        $phone_number[7].$phone_number[8],  //GH(78)
+        $phone_number[6].$phone_number[7],  //FG(67)
+        $phone_number[5].$phone_number[6],  //EF(56)
+        $phone_number[4].$phone_number[5],  //DE(45)
+        $phone_number[3].$phone_number[4],  //CD(34)
+        $phone_number[2].$phone_number[3],  //BC(23)
+    ];
+    return $new_pairs;
+    //$pairs = ["11","22","33","44","55","66","77"];;
+}
+function calculate_grade($percent){
+    if($percent >= 95){
+        //GRADE A+
+        $grade = "A+";
+    }
+    else if($percent > 80){
+        //GRADE A        
+        $grade = "A";
+    }
+    else if($percent > 70){
+        //GRADE B+
+        $grade = "B+";
+    }
+    else if($percent > 60){
+        //GRADE B        
+        $grade = "B";
+    }
+    else if($percent > 50){
+        //GRADE C+
+        $grade = "C+";
+    }
+    else if($percent > 30){
+        //GRADE C
+        $grade = "C";
+    }
+    else{
+        //GRADE D
+        $grade = "D";
+    }
+    return $grade;
+}
+function calculate_score_for_grade($pairs){
+    $number = intval($pairs);
+    $green_set = [14,15,16,19,22,23,24,26,28,29,32,35,36,39,41,42,44,45,46,49,51,53,54,55,56,59,61,62,63,64,65,66,69,78,79,82,87,89,91,92,93,94,95,96,97,98,99];
+    $yellow_set = [33,47,74];
+    $red_set = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,17,18,20,21,25,27,30,31,34,37,38,40,43,48,50,52,57,58,60,67,68,70,71,72,73,75,76,77,80,81,83,84,85,86,88,90];
+    if (in_array($number, $green_set)) {
+        return 100;
+    }
+    else if (in_array($number, $yellow_set)) {
+        return 50;
+    }
+    else if (in_array($number, $red_set)) {
+        return 0;
+    }
+    return -1;
+}
+function grade($phone_number){
+
+    $pairs_array = generate_pairs_array_for_grade($phone_number);
+    echo "<br>PAIRS : ". join(", ",$pairs_array);
+
+    //CALCULATE SCORE
+    $scores = [];
+    $sum_score = 0;
+    foreach($pairs_array as $pairs){
+        $s = calculate_score_for_grade($pairs);
+        $scores[] = $s;
+        $sum_score = $sum_score + $s;
+    }    
+
+    $percent = $sum_score / count($scores);
+    $grade = calculate_grade($percent);
+      
+    echo "<br>SCORES : ". join(", ",$scores);
+    echo  "<br> Percent : ".$percent;
+    echo  "<br> Grade : ".$grade;
+
+}
+
+?>
 
 <?php
 function generate_pairs_array($phone_number){
@@ -30,34 +163,8 @@ function generate_pairs_array($phone_number){
 function calculate_score($pairs){
     return rand(0,999);
 }
-function calculate_grade($sum_score_percent){
-    if($sum_score_percent > 950){
-        //GRADE A+
-        $grade = "A+";
-    }
-    else if($sum_score_percent > 750){
-        //GRADE A        
-        $grade = "A";
-    }
-    else if($sum_score_percent > 500){
-        //GRADE B
-        $grade = "B";
-    }
-    else if($sum_score_percent > 200){
-        //GRADE C        
-        $grade = "C";
-    }
-    else if($sum_score_percent > 0){
-        //GRADE D
-        $grade = "D";
-    }
-    else if($sum_score_percent <= 0){
-        //GRADE F
-        $grade = "F";
-    }
-    return $grade;
-}
-function calculate($phone_number){
+
+function graph($phone_number){
 
     //จับคู่ 7 คู่
     $pairs_array = generate_pairs_array($phone_number);
@@ -65,24 +172,24 @@ function calculate($phone_number){
 
     //CALCULATE SCORE
     $scores = [];
-    $sum_score = 0;
+    //$sum_score = 0;
     foreach($pairs_array as $pairs){
         $s = calculate_score($pairs);
         $scores[] = $s;
-        $sum_score = $sum_score + $s;
+        //$sum_score = $sum_score + $s;
     }
     //แสดงผลลัพธ์เช่น 999,466,900,543,245,778,900    
     echo "<br>SCORES : ". join(", ",$scores);
-    echo "<br>SUM : ". $sum_score;
+    //echo "<br>SUM : ". $sum_score;
 
     //CALCULATE PERCENT : MAX 1000
-    $sum_score_percent = $sum_score / count($pairs_array) ;
+    //$percent = $sum_score / count($pairs_array) ;
     
     //CALCULATE GRADE
-    $grade = calculate_grade($sum_score_percent);
+    //$grade = calculate_grade($percent);
     
-    echo "<br>SUM_SCORE_PERCENT : ". $sum_score_percent;
-    echo "<br>Grade : ". $grade;
+    //echo "<br>percent : ". $percent;
+    //echo "<br>Grade : ". $grade;
     return "[".join(", ",$scores)."]";
 }
 ?>
@@ -95,7 +202,6 @@ function calculate($phone_number){
 
 
 
-<canvas id="myChart" style="max-width: 600px; max-height : 600px;"></canvas>
 <script>
 var ctx = document.getElementById('myChart');
 var myChart = new Chart(ctx, {
