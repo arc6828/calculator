@@ -7,16 +7,14 @@
 <form action="/calculator/index.php" method="GET">
     <input name="phone_number"  id="phone" placeholder="กรอกเบอร์โดยไม่ต้องใส่ -" value="<?= isset($_GET['phone_number']) ? $_GET['phone_number']  : '' ?>" required >
     <input name="date_of_birth"  id="date_of_birth" placeholder="วันเดือนปีเกิดของท่าน" type="date" value="<?= isset($_GET['date_of_birth']) ? $_GET['date_of_birth']  : '' ?>">
-    <select name="hour"  id="hour">
-        <?php for($i=0; $i<24; $i++){ ?>
-        <option value="<?=$i?>" <?= intval($_GET['hour'])==$i?'selected':'' ?> ><?=sprintf("%02d", $i)?></option>
-        <?php } ?>
+    <select name="slot"  id="slot">
+        <option value="1">6.00 - 7.29</option>
+        <option value="2">7.30 - 7.29</option>
+        <option value="3">9.00 - 7.29</option>
+        <option value="4">10.00 - 7.29</option>
+        <option value="5">12.00 - 7.29</option>
+        <option value="6">13.00 - 7.29</option>
     </select >
-    <select name="minute"  id="minute">
-        <?php for($i=0; $i<60; $i++){ ?>
-        <option value="<?=$i?>"  <?= intval($_GET['minute'])==$i?'selected':'' ?> ><?=sprintf("%02d", $i)?></option>
-        <?php } ?>
-    </select>
     <button>ทำนาย</button> 
 
 </form>
@@ -56,7 +54,42 @@ function general($phone_number){
 
     $d=date_create($date);
     echo "<br>Day Code : ". (date_format($d,"l")). " " .(date_format($d,"w")+1);
+
+    //START
+    $day_code = (date_format($d,"w")+1);
+    $slot = $_GET['slot'];
+    if($slot <9 ){
+        $key = $day_code . "-day";
+    }else{
+        $key = $day_code . "-night";
+    }
+    /*
+    $data = [
+        "1-day" => [1,6,4,2,7,5,3,1],   "1-night" =>  [1,5,2,6,3,7,4,1],
+        "2-day" => [1,6,4,2,7,5,3,1],   "2-night" =>  [1,5,2,6,3,7,4,1],
+        "3-day" => [1,6,4,2,7,5,3,1],   "3-night" =>  [1,5,2,6,3,7,4,1],
+        "4-day" => [1,6,4,2,7,5,3,1],   "4-night" =>  [1,5,2,6,3,7,4,1],
+        "5-day" => [1,6,4,2,7,5,3,1],   "5-night" =>  [1,5,2,6,3,7,4,1],
+        "6-day" => [1,6,4,2,7,5,3,1],   "6-night" =>  [1,5,2,6,3,7,4,1],
+        "7-day" => [1,6,4,2,7,5,3,1],   "7-night" =>  [1,5,2,6,3,7,4,1],
+    ];
+    */
     
+    $data = [
+        "1-day" => [1,6,4,2,7,5,3,1],   "1-night" =>  [1,5,2,6,3,7,4,1],
+        "2-day" => [1,6,4,2,7,5,3,1],   "2-night" =>  [1,5,2,6,3,7,4,1],
+        "3-day" => [1,6,4,2,7,5,3,1],   "3-night" =>  [1,5,2,6,3,7,4,1],
+        "4-day" => [1,6,4,2,7,5,3,1],   "4-night" =>  [1,5,2,6,3,7,4,1],
+        "5-day" => [1,6,4,2,7,5,3,1],   "5-night" =>  [1,5,2,6,3,7,4,1],
+        "6-day" => [1,6,4,2,7,5,3,1],   "6-night" =>  [1,5,2,6,3,7,4,1],
+        "7-day" => [1,6,4,2,7,5,3,1],   "7-night" =>  [1,5,2,6,3,7,4,1],
+    ];
+    
+    $a = $data[$key];
+    print_r($a);
+
+    echo "<br>slot : ". $slot;
+    echo "<br>$a : ". $$slot;
 }
 ?>
 
