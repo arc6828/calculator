@@ -34,16 +34,6 @@
         <h1>Phone Number</h1>
         <div class="table-responsive" >
             <table class="table table-sm"  id="table" style="width:100%">
-                <thead>
-                    <tr>
-                        <th>Number</th>
-                        <th>Price</th>
-                        <th>Operator</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    
-                </tbody>
             </table>
         </div>
             
@@ -64,6 +54,11 @@
                         $('#table').DataTable({
                             "data": dataSet,
                             "deferRender" : true,
+                            "columns": [
+                                { title: "หมายเลข" },
+                                { title: "ราคา" },
+                                { title: "ค่ายมือถือ" },
+                            ],
                             //deferRender: true,
                         });
                         
