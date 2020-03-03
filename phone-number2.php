@@ -85,8 +85,6 @@ if (empty($values)) {
     $data = [];
     $count = 0;
     foreach ($values as $row) {
-        $operator = $_POST['operator'];
-        if($row[2] != $operator){ continue ;}
         // Print columns A and B, which correspond to indices 0 and 4.
         $data[] = [
             "number" => $row[0],

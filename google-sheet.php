@@ -29,9 +29,102 @@
 	<script type="text/javascript" language="javascript" src="https://code.jquery.com/jquery-3.3.1.js"></script>
 	<script type="text/javascript" language="javascript" src="https://cdn.datatables.net/1.10.20/js/jquery.dataTables.min.js"></script>
 	<script type="text/javascript" language="javascript" src="https://cdn.datatables.net/1.10.20/js/dataTables.bootstrap4.min.js"></script>
-
+    <style>
+    .number{
+        width:50px;
+    }
+    </style>
     <div class="container">
         <h1>Phone Number</h1>
+        <div class="row">
+            <div class="col-lg-3">by ตำแหน่ง</div>
+            <div class="col-lg-9">
+                <input class="number"  name="number-0">
+                <input class="number"  name="number-1">
+                <input class="number"  name="number-2"> - 
+                <input class="number"  name="number-3">
+                <input class="number"  name="number-4">
+                <input class="number"  name="number-5"> - 
+                <input class="number"  name="number-6">
+                <input class="number"  name="number-7">
+                <input class="number"  name="number-8">
+                <input class="number"  name="number-9">
+            </div>
+        </div>
+        
+        <div class="row">
+            <div class="col-lg-3">by Price Range</div>
+            <div class="col-lg-9">
+                <select name="range" id="range">
+                    <?php foreach([1000,1500,2000,2500,3000,3500,4000,4500,5000] as $price){ ?> 
+                    <option value="<?=$price ?>">น้อยกว่า <?=$price ?></option>
+                    <?php }?>
+                </select>
+            </div>
+        </div>        
+        
+        <div class="row">
+            <div class="col-lg-3">by ผลรวม</div>
+            <div class="col-lg-9">
+                <select name="sum" >
+                    <?php for($i=9; $i<=81; $i++){ ?> 
+                    <option value="<?=$i ?>"><?=$i ?></option>
+                    <?php }?>
+                </select>
+            </div>
+        </div>
+
+        
+        <div class="row">
+            <div class="col-lg-3">by Operator</div>
+            <div class="col-lg-9">
+                <select name="operator" id="operator">
+                    <?php foreach(["ais","dtac","truemove"] as $operator){ ?> 
+                    <option value="<?=$operator ?>"><?=$operator ?></option>
+                    <?php }?>
+                </select>
+            </div>
+        </div>        
+
+        <button id="submit">Submit</button>
+        
+
+        <script>
+            document.querySelector("#submit").addEventListener("click", function(){
+                let data = {
+                    "operator": document.querySelector("#operator").value,
+                }
+                fetch('phone-number.php', {
+                    method: 'POST', // or 'PUT'
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data),
+                })
+                
+                    .then((response) => {
+                        return response.json();
+                    })
+                    .then((myJson) => {
+                        console.log(myJson);
+                        let dataSet = [];
+                        for(item of myJson){
+                            dataSet.push([item.number , item.price , item.operator]);
+                        }
+                        
+                        var table = $('#table').DataTable();
+
+                        table.clear();
+                        table.rows.add( dataSet ).draw();
+                        
+                    })
+                    .catch((error) => {
+                        console.error('Error:', error);
+                    });;
+                //END FETCH
+            });
+        </script>
+
         <div class="table-responsive" >
             <table class="table table-sm"  id="table" style="width:100%">
             </table>
@@ -62,6 +155,9 @@
                             //deferRender: true,
                         });
                         
+                    })
+                    .catch((error) => {
+                        console.error('Error:', error);
                     });
                 //END FETCH
                 
